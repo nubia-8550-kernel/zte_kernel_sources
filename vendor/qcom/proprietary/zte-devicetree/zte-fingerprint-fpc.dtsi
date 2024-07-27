@@ -1,0 +1,8 @@
+&soc {
+	fpc1020 {
+		status = "ok";
+		compatible = "fpc,fpc1020";
+		reg = <0>;
+		fpc_vdd = <&tlmm 22 0x1>;
+	};
+};

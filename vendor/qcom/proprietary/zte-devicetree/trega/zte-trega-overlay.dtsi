@@ -1,0 +1,818 @@
+/* dtsi for trega board (PQ82MAGIC_8S)*/
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/clock/qcom,rpmh.h>
+#include "../zte-fingerprint-nubia-goodix.dtsi"
+
+&reserved_memory {
+};
+
+&qupv3_se4_spi {
+
+	status = "ok";
+
+	goodix-berlin@0 {
+		compatible = "goodix,brl-d";
+		reg = <0>;
+		spi-max-frequency = <20000000>;
+		iovdd-enable-gpio = <&tlmm 59 0x0>;
+		goodix,avdd-name = "avdd";
+		avdd-supply = <&L14B>;
+		goodix,reset-gpio = <&tlmm 24 0x0>;
+		goodix,irq-gpio = <&tlmm 25 0x0>;
+		goodix,irq-flags = <2>; /* 1:trigger rising, 2:trigger falling;*/
+		goodix,panel-max-x = <17856>;
+		goodix,panel-max-y = <39680>;
+		goodix,panel-max-w = <4080>;
+		goodix,firmware-name = "goodix_firmware_9916r.bin";
+		goodix,config-name = "goodix_cfg_group_9916r.bin";
+		panel = <&dsi_bf068_rm692h0_6p97_magic_dsc_cmd>;
+	};
+};
+
+&soc {
+	zte_tp:zte_tp {
+		compatible = "zte_tp";
+		zte,tp_algo;
+		zte,tp_jitter_check = <15>;
+		zte,tp_jitter_timer = <80>;
+		zte,tp_long_press;
+		zte,tp_long_press_timer = <800>;
+		zte,tp_long_press_left_v = <320>;
+		zte,tp_long_press_right_v = <320>;
+		zte,tp_long_press_left_h = <480>; /*camera */
+		zte,tp_long_press_right_h = <320>; /*charger */
+		zte,tp_edge_click_suppression_pixel = <80>;
+		zte,ufp_enable;
+		zte,ufp_circle_center_x = <8928>;
+		zte,ufp_circle_center_y = <29728>;
+		zte,ufp_circle_radius = <1280>;
+	};
+	
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default>; 
+		
+		vol_down {
+			status = "disabled";
+		};         
+	};
+
+	gpio_keys_nubia {
+		compatible = "gpio-keys_nubia";
+		label = "gpio-keys_nubia";
+
+		game_sw {
+			label = "game_sw";
+			gpios = <&tlmm 17 0>;
+			gpion = <&tlmm 85 0>;
+			linux,input-type = <5>;
+			linux,code = <0x0f>;
+			debounce-interval = <30>;
+			gpio-key,wakeup;
+		};
+	};
+        
+	hall_sensor{
+		status = "disabled";
+	};
+	
+	nubia_usb_switch_dp_gpio: nubia_usb_switch_dp_gpio_ctrl {
+		compatible = "nubia,usb_switch_dp";
+		qcom,switch-en-gpio = <&tlmm 90 0x00>;
+		qcom,switch-en-flag = <1>;
+		qcom,switch-mode-gpio = <&tlmm 91 0x00>;
+		qcom,switch-mode-flag = <0>;
+	};
+
+	nubia_hw_ver_gpio: nubia_hw_gpio_ctrl {
+		compatible = "nubia_hw_gpio_ctrl";
+		qcom,pcb-gpio1 = <&tlmm 71 0x00>;
+		qcom,pcb-gpio2 = <&tlmm 72 0x00>;
+		qcom,pcb-gpio3 = <&tlmm 73 0x00>;
+		qcom,pcb-gpio4 = <&tlmm 68 0x00>;
+		qcom,rf-gpio1 = <&tlmm 142 0x00>;
+		qcom,rf-gpio2 = <&tlmm 143 0x00>;
+		qcom,config-gpio1 = <&tlmm 48 0x00>;
+		qcom,config-gpio2 = <&tlmm 49 0x00>;
+		pinctrl-names = "pull_up_default","pull_down_default";
+		pinctrl-0 = <&nubia_gpio_default>;
+		pinctrl-1 = <&nubia_gpio_pulldown>;
+	};
+};
+
+/***************************awinic start******************************/
+&qupv3_hub_i2c4 {
+	status = "ok";
+	qcom,clk-freq-out = <1000000>;
+	haptic_hv_r@5A {
+		status = "okay";
+		compatible = "awinic,haptic_hv_r";
+		reg = <0x5A>;
+		irq-gpio = <&tlmm 8 0>;
+		reset-gpio = <&tlmm 60 0>;
+		pinctrl-names = "irq_active";
+		pinctrl-0 = <&gpio8_input_pull_up>;
+		f0_pre = < 1700 >;
+		mode = /bits/ 8 < 5 >;
+		f0_cali_percent = /bits/ 8 < 7 >;
+/*******************************aw869x*******************************/
+		aw869x_max_bst_vol = /bits/ 8 <0x1f>;
+		aw869x_cont_drv_lev = /bits/ 8 < 53 >;
+		aw869x_cont_drv_lvl_ov = /bits/ 8 < 125 >;
+		aw869x_cont_td = < 0x009A >;
+		aw869x_cont_zc_thr = < 0x0FF1 >;
+		aw869x_cont_num_brk = /bits/ 8 < 3 >;
+		aw869x_f0_coeff = < 260 >; /*Don't modify it 2.604167*/
+		aw869x_duration_time = /bits/ 8 < 20 30 60 >;
+		aw869x_f0_trace_parameter = /bits/ 8 < 0x05 0x03 0x02 0x0f >;
+		aw869x_bemf_config = /bits/ 8 < 0x10 0x08 0x03 0xf8 >;
+		aw869x_tset = /bits/ 8 < 0x12 >;
+		aw869x_r_spare = /bits/ 8 < 0x68 >;
+		aw869x_bstdbg = /bits/ 8 < 0x30 0xeb 0xd4 0 0 0 >;
+
+/******************************aw869xx*******************************/
+		aw869xx_max_bst_vol = /bits/ 8 <0x3f>;
+		aw869xx_brk_bst_md = /bits/ 8 < 0 >;
+		aw869xx_cont_drv1_lvl = /bits/ 8 < 0x7F >;
+		aw869xx_cont_drv2_lvl = /bits/ 8 < 0x36 >;
+		aw869xx_cont_brk_time = /bits/ 8 < 0x08 >;
+		aw869xx_cont_tset = /bits/ 8 < 0x06 >;
+		aw869xx_cont_bemf_set = /bits/ 8 < 0x02 >;
+		aw869xx_cont_drv_width = /bits/ 8 < 0x6A >;
+		aw869xx_cont_wait_num = /bits/ 8 < 0x06 >;
+		aw869xx_cont_bst_brk_gain = /bits/ 8 < 0x05 >;
+		aw869xx_cont_brk_gain = /bits/ 8 < 0x08 >;
+		aw869xx_cont_drv1_time = /bits/ 8 < 0x04 >;
+		aw869xx_cont_drv2_time = /bits/ 8 < 0x14 >;
+		aw869xx_cont_track_margin = /bits/ 8 < 0x12 >;
+		aw869xx_duration_time = /bits/ 8 < 20 30 60 >;
+		aw869xx_sine_array = /bits/ 8 < 0x05 0xB2 0xFF 0xEF >;
+		aw869xx_d2s_gain = /bits/ 8 < 0x04 >;
+		aw869xx_bstcfg = /bits/ 8 < 0x20 0x24 0x96 0x40 0x11 >;
+		aw869xx_bst_vol_default = /bits/ 8 < 0x20 >;
+		aw869xx_trig_config = /bits/ 8 < 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0 >;
+		aw869xx_bst_vol_ram = /bits/ 8 < 0x20 >;
+		aw869xx_bst_vol_rtp = /bits/ 8 < 0x20 >;
+		/* aw869xx_is_enabled_auto_bst; */
+		/* aw869xx_is_enabled_i2s; */
+		/* aw869xx_is_enabled_one_wire; */
+
+/******************************aw8671x*******************************/
+		aw8671x_max_bst_vol = /bits/ 8 <0x0f>;
+		aw8671x_brk_bst_md = /bits/ 8 < 0 >;
+		aw8671x_cont_drv1_lvl = /bits/ 8 < 0x7F >;
+		aw8671x_cont_drv2_lvl = /bits/ 8 < 0x36 >;
+		aw8671x_cont_brk_time = /bits/ 8 < 0x08 >;
+		aw8671x_cont_tset = /bits/ 8 < 0x06 >;
+		aw8671x_cont_bemf_set = /bits/ 8 < 0x02 >;
+		aw8671x_cont_drv_width = /bits/ 8 < 0x6A >;
+		aw8671x_cont_wait_num = /bits/ 8 < 0x06 >;
+		aw8671x_cont_bst_brk_gain = /bits/ 8 < 0x05 >;
+		aw8671x_cont_brk_gain = /bits/ 8 < 0x08 >;
+		aw8671x_cont_drv1_time = /bits/ 8 < 0x04 >;
+		aw8671x_cont_drv2_time = /bits/ 8 < 0x14 >;
+		aw8671x_cont_track_margin = /bits/ 8 < 0x12 >;
+		aw8671x_duration_time = /bits/ 8 < 20 30 60 >;
+		aw8671x_d2s_gain = /bits/ 8 < 0x04 >;
+		aw8671x_bst_vol_default = /bits/ 8 < 0x04 >;
+		aw8671x_trig_config = /bits/ 8 < 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0 >;
+		aw8671x_bst_vol_ram = /bits/ 8 < 0x04 >;
+		aw8671x_bst_vol_rtp = /bits/ 8 < 0x04 >;
+		/* aw8671x_is_enabled_auto_bst; */
+		/* aw8671x_is_enabled_i2s; */
+		/* aw8671x_is_enabled_one_wire; */
+
+/******************************aw8692x*******************************/
+		aw8692x_max_bst_vol = /bits/ 8 < 0x7F >;
+		aw8692x_cont_drv1_lvl = /bits/ 8 < 0x7F >;
+		aw8692x_cont_drv2_lvl = /bits/ 8 < 0x28 >;
+		aw8692x_cont_drv1_time = /bits/ 8 < 0x04 >;
+		aw8692x_cont_drv2_time = /bits/ 8 < 0x06 >;
+		aw8692x_cont_drv_width = /bits/ 8 < 0x71 >;
+		aw8692x_cont_wait_num = /bits/ 8 < 0x06 >;
+		aw8692x_cont_brk_time = /bits/ 8 < 0x0 >;
+		aw8692x_cont_track_margin = /bits/ 8 < 0x0C >;
+		aw8692x_brk_bst_md = /bits/ 8 < 0 >;
+		aw8692x_cont_tset = /bits/ 8 < 0x06 >;
+		aw8692x_cont_bemf_set = /bits/ 8 < 0x02 >;
+		aw8692x_cont_bst_brk_gain = /bits/ 8 < 0x05 >;
+		aw8692x_cont_brk_gain = /bits/ 8 < 0x08 >;
+		aw8692x_duration_time = /bits/ 8 < 20 30 60 >;
+		aw8692x_d2s_gain = /bits/ 8 < 0x04 >;
+		aw8692x_trig_config = /bits/ 8 < 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0 >;
+		aw8692x_bst_vol_default = /bits/ 8 < 0x50 >;
+		aw8692x_bst_vol_ram = /bits/ 8 < 0x50 >;
+		aw8692x_bst_vol_rtp = /bits/ 8 < 0x50 >;
+		/* aw8692x_is_enabled_auto_bst; */
+		/* aw8692x_is_enabled_one_wire; */
+	};
+};
+&tlmm {
+ 	gpio8_input_pull_up: gpio8_input_pull_up {
+ 		mux {
+ 			 pins = "gpio8";
+ 			 function = "gpio";
+ 		};
+ 
+ 		config {
+ 			pins = "gpio8";
+ 			drive-strength = <2>;
+ 			bias-pull-up;
+ 			input-enable;
+ 		};
+ 	};
+};
+
+&qupv3_hub_i2c5 {
+	status = "ok";
+	qcom,clk-freq-out = <1000000>;
+	haptic_hv_l@5A {
+		status = "okay";
+		compatible = "awinic,haptic_hv_l";
+		reg = <0x5A>;
+		irq-gpio = <&tlmm 9 0>;
+		reset-gpio = <&tlmm 61 0>;
+		pinctrl-names = "irq_active";
+		pinctrl-0 = <&gpio9_input_pull_up>;
+		f0_pre = < 1700 >;
+		mode = /bits/ 8 < 5 >;
+		f0_cali_percent = /bits/ 8 < 7 >;
+/*******************************aw869x*******************************/
+		aw869x_max_bst_vol = /bits/ 8 <0x1f>;
+		aw869x_cont_drv_lev = /bits/ 8 < 53 >;
+		aw869x_cont_drv_lvl_ov = /bits/ 8 < 125 >;
+		aw869x_cont_td = < 0x009A >;
+		aw869x_cont_zc_thr = < 0x0FF1 >;
+		aw869x_cont_num_brk = /bits/ 8 < 3 >;
+		aw869x_f0_coeff = < 260 >; /*Don't modify it 2.604167*/
+		aw869x_duration_time = /bits/ 8 < 20 30 60 >;
+		aw869x_f0_trace_parameter = /bits/ 8 < 0x05 0x03 0x02 0x0f >;
+		aw869x_bemf_config = /bits/ 8 < 0x10 0x08 0x03 0xf8 >;
+		aw869x_tset = /bits/ 8 < 0x12 >;
+		aw869x_r_spare = /bits/ 8 < 0x68 >;
+		aw869x_bstdbg = /bits/ 8 < 0x30 0xeb 0xd4 0 0 0 >;
+
+/******************************aw869xx*******************************/
+		aw869xx_max_bst_vol = /bits/ 8 <0x3f>;
+		aw869xx_brk_bst_md = /bits/ 8 < 0 >;
+		aw869xx_cont_drv1_lvl = /bits/ 8 < 0x7F >;
+		aw869xx_cont_drv2_lvl = /bits/ 8 < 0x36 >;
+		aw869xx_cont_brk_time = /bits/ 8 < 0x08 >;
+		aw869xx_cont_tset = /bits/ 8 < 0x06 >;
+		aw869xx_cont_bemf_set = /bits/ 8 < 0x02 >;
+		aw869xx_cont_drv_width = /bits/ 8 < 0x6A >;
+		aw869xx_cont_wait_num = /bits/ 8 < 0x06 >;
+		aw869xx_cont_bst_brk_gain = /bits/ 8 < 0x05 >;
+		aw869xx_cont_brk_gain = /bits/ 8 < 0x08 >;
+		aw869xx_cont_drv1_time = /bits/ 8 < 0x04 >;
+		aw869xx_cont_drv2_time = /bits/ 8 < 0x14 >;
+		aw869xx_cont_track_margin = /bits/ 8 < 0x12 >;
+		aw869xx_duration_time = /bits/ 8 < 20 30 60 >;
+		aw869xx_sine_array = /bits/ 8 < 0x05 0xB2 0xFF 0xEF >;
+		aw869xx_d2s_gain = /bits/ 8 < 0x04 >;
+		aw869xx_bstcfg = /bits/ 8 < 0x20 0x24 0x96 0x40 0x11 >;
+		aw869xx_bst_vol_default = /bits/ 8 < 0x20 >;
+		aw869xx_trig_config = /bits/ 8 < 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0 >;
+		aw869xx_bst_vol_ram = /bits/ 8 < 0x20 >;
+		aw869xx_bst_vol_rtp = /bits/ 8 < 0x20 >;
+		/* aw869xx_is_enabled_auto_bst; */
+		/* aw869xx_is_enabled_i2s; */
+		/* aw869xx_is_enabled_one_wire; */
+
+/******************************aw8671x*******************************/
+		aw8671x_max_bst_vol = /bits/ 8 <0x0f>;
+		aw8671x_brk_bst_md = /bits/ 8 < 0 >;
+		aw8671x_cont_drv1_lvl = /bits/ 8 < 0x7F >;
+		aw8671x_cont_drv2_lvl = /bits/ 8 < 0x28 >;
+		aw8671x_cont_brk_time = /bits/ 8 < 0x08 >;
+		aw8671x_cont_tset = /bits/ 8 < 0x06 >;
+		aw8671x_cont_bemf_set = /bits/ 8 < 0x02 >;
+		aw8671x_cont_drv_width = /bits/ 8 < 0x71 >;
+		aw8671x_cont_wait_num = /bits/ 8 < 0x06 >;
+		aw8671x_cont_bst_brk_gain = /bits/ 8 < 0x05 >;
+		aw8671x_cont_brk_gain = /bits/ 8 < 0x08 >;
+		aw8671x_cont_drv1_time = /bits/ 8 < 0x04 >;
+		aw8671x_cont_drv2_time = /bits/ 8 < 0x14 >;
+		aw8671x_cont_track_margin = /bits/ 8 < 0x12 >;
+		aw8671x_duration_time = /bits/ 8 < 20 30 60 >;
+		aw8671x_d2s_gain = /bits/ 8 < 0x04 >;
+		aw8671x_bst_vol_default = /bits/ 8 < 0x04 >;
+		aw8671x_trig_config = /bits/ 8 < 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0 >;
+		aw8671x_bst_vol_ram = /bits/ 8 < 0x04 >;
+		aw8671x_bst_vol_rtp = /bits/ 8 < 0x04 >;
+		/* aw8671x_is_enabled_auto_bst; */
+		/* aw8671x_is_enabled_i2s; */
+		/* aw8671x_is_enabled_one_wire; */
+
+/******************************aw8692x*******************************/
+		aw8692x_max_bst_vol = /bits/ 8 < 0x7F >;
+		aw8692x_cont_drv1_lvl = /bits/ 8 < 0x7F >;
+		aw8692x_cont_drv2_lvl = /bits/ 8 < 0x50 >;
+		aw8692x_cont_drv1_time = /bits/ 8 < 0x04 >;
+		aw8692x_cont_drv2_time = /bits/ 8 < 0x06 >;
+		aw8692x_cont_drv_width = /bits/ 8 < 0x6A >;
+		aw8692x_cont_wait_num = /bits/ 8 < 0x06 >;
+		aw8692x_cont_brk_time = /bits/ 8 < 0x0 >;
+		aw8692x_cont_track_margin = /bits/ 8 < 0x0C >;
+		aw8692x_brk_bst_md = /bits/ 8 < 0 >;
+		aw8692x_cont_tset = /bits/ 8 < 0x06 >;
+		aw8692x_cont_bemf_set = /bits/ 8 < 0x02 >;
+		aw8692x_cont_bst_brk_gain = /bits/ 8 < 0x05 >;
+		aw8692x_cont_brk_gain = /bits/ 8 < 0x08 >;
+		aw8692x_duration_time = /bits/ 8 < 20 30 60 >;
+		aw8692x_d2s_gain = /bits/ 8 < 0x04 >;
+		aw8692x_trig_config = /bits/ 8 < 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0 >;
+		aw8692x_bst_vol_default = /bits/ 8 < 0x50 >;
+		aw8692x_bst_vol_ram = /bits/ 8 < 0x50 >;
+		aw8692x_bst_vol_rtp = /bits/ 8 < 0x50 >;
+		/* aw8692x_is_enabled_auto_bst; */
+		/* aw8692x_is_enabled_one_wire; */
+	};
+};
+&tlmm {
+ 	gpio9_input_pull_up: gpio9_input_pull_up {
+ 		mux {
+ 			 pins = "gpio9";
+ 			 function = "gpio";
+ 		};
+ 
+ 		config {
+ 			pins = "gpio9";
+ 			drive-strength = <2>;
+ 			bias-pull-up;
+ 			input-enable;
+ 		};
+ 	};
+};
+/***************************awinic end******************************/
+
+&pm8550_gpios {
+    key_vol_down {
+		status = "disabled";
+	};
+	
+    fan_pwm {
+        fan_pwm: fan_pwm {
+			pins = "gpio9";
+			function = "func1";
+			input-disable;
+			output-enable;
+			output-high;
+			qcom,drive-strength = <3>;
+			power-source = <0>;     /* 1.8V */
+			drive-push-pull;
+	    };
+    };
+};
+
+&tlmm {
+    fan_speed{
+        fan_speed: fan_speed {
+			mux {
+				pins = "gpio174";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio174";
+				drive-strength = <16>;
+                                bias-pull-up;
+				input-enable;
+			};
+
+        };
+    
+    };
+	aw_int_default_sar0: aw_int_default_sar0 {
+
+			mux {
+				pins = "gpio63";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio63";
+				output-disable;
+			};
+		};
+	aw_int_suspend_sar0: aw_int_suspend_sar0 {
+		   mux {
+			   pins = "gpio63";
+			   function = "gpio";
+		   };
+		 config {
+			  pins = "gpio63";
+			  drive-strength = <6>;
+			  bias-pull-down;
+		   };
+		};
+	aw_int_active_sar0: aw_int_active_sar0 {
+		  mux {
+			  pins = "gpio63";
+			  function = "gpio";
+		   };
+		   config {
+			 pins = "gpio63";
+			 drive-strength = <6>;
+			 bias-pull-up;
+		   };
+		};
+	aw_int_default_sar1: aw_int_default_sar1 {
+       mux {
+           pins = "gpio62";
+           function = "gpio";
+       };
+      config {
+           pins = "gpio62";
+           output-disable;
+       };
+    };
+    aw_int_suspend_sar1: aw_int_suspend_sar1 {
+       mux {
+           pins = "gpio62";
+           function = "gpio";
+       };
+     config {
+          pins = "gpio62";
+          drive-strength = <6>;
+          bias-pull-down;
+       };
+    };
+    aw_int_active_sar1: aw_int_active_sar1 {
+      mux {
+          pins = "gpio62";
+          function = "gpio";
+       };
+    config {
+         pins = "gpio62";
+         drive-strength = <6>;
+         bias-pull-up;
+       };
+    };
+};
+
+&pm_humu_l16 {
+    regulator-max-microvolt = <3312000>;
+};
+
+&spmi_bus {
+    qcom,pm8550@1 {
+        fan_pwm_dev: pwms@eb00 {
+            compatible = "qcom,pwm-lpg";
+            reg = <0xeb00>;
+            reg-names = "lpg-base";
+            #pwm-cells = <2>;
+            qcom,num-lpg-channels = <1>;
+        };
+
+        nb_fan: qcom,fan@ef00 {
+            compatible = "soc,fan";
+            reg = <0xef00>;
+            fan,avdd-supply = <&pm_humu_l16>;
+            regulator-names = "avdd";
+            pinctrl-names ="default";
+            pinctrl-0 =<&fan_speed &fan_pwm>;
+            fan,pwm-gpio = <&pm8550_gpios 9 GPIO_ACTIVE_HIGH>;
+            fan,speed-gpio = <&tlmm 174 GPIO_ACTIVE_HIGH>;
+            fan,voltage = <3312000>;
+            fan {
+                label = "fan";
+                pwms = <&fan_pwm_dev 0 1000000>;
+            };
+	    };
+    };	
+};
+
+&qupv3_se0_i2c{
+  #address-cells = <1>;
+  #size-cells = <0>;
+  status = "okay";
+  qcom,clk-freq-out = <400000>;
+	aw22xxx_led@6a {
+		status = "okay";
+		compatible = "awinic,aw22xxx_led";
+		reg = <0x6a>;
+		reset-gpio = <&tlmm 14 0x0>;
+		nubia_ver-gpio = <&tlmm 7 1>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <15 0x2002>;
+		irq-gpio = <&tlmm 15 0x2002>;
+		pinctrl-names = "aw22xxx_led_default", "aw22xxx_led_sleep";
+		pinctrl-0 = <&aw22xxx_int_active &aw22xxx_reset_active>;
+		pinctrl-1 = <&aw22xxx_int_suspend &aw22xxx_reset_suspend>;
+		aw22xxx,led {
+			aw22xxx,name = "aw22xxx_led";
+			aw22xxx,imax = <8>;
+			aw22xxx,brightness = <128>;
+			aw22xxx,max_brightness = <255>;
+		};
+	};
+};
+
+&tlmm{
+		aw22xxx_reset {
+			aw22xxx_reset_active: aw22xxx_reset_active {
+				mux {
+					pins = "gpio14";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio14";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+
+			aw22xxx_reset_suspend: aw22xxx_reset_suspend {
+				mux {
+					pins = "gpio14";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio14";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+		};
+
+		aw22xxx_int {
+			aw22xxx_int_active: aw22xxx_int_active {
+				mux {
+					pins = "gpio15";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio15";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+			aw22xxx_int_suspend: aw22xxx_int_suspend {
+				mux {
+					pins = "gpio15";
+					function = "gpio";
+				};
+				config {
+					pins = "gpio15";
+					drive-strength = <6>;
+					bias-pull-up;
+				};
+			};
+		};
+	nubia_gpio {
+		nubia_gpio_default: nubia_gpio_default {
+			mux {
+				pins = "gpio71", "gpio72","gpio73","gpio68","gpio142","gpio143";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio71", "gpio72","gpio73","gpio68","gpio142","gpio143";
+				driver-strength = <2>; /* 2mA */
+				bias-pull-up;
+				input-enable;
+			};
+		};
+
+		nubia_gpio_pulldown: nubia_gpio_pulldown {
+			mux {
+				pins = "gpio71", "gpio72","gpio73","gpio68","gpio142","gpio143";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio71", "gpio72","gpio73","gpio68","gpio142","gpio143";
+				driver-strength = <2>; /* 2mA */
+				bias-pull-down;
+				input-enable;
+			};
+		};
+	};
+};
+
+&qupv3_hub_i2c4 {
+	status = "okay";
+        #address-cells = <1>;
+        #size-cells = <0>;
+	tfa98xx@35 {
+		compatible = "tfa,tfa98xx";
+		reg = <0x35>;
+		reset-gpio = <&tlmm 123 0x00>;
+		irq-gpio = <&tlmm 124 0x00>;
+                reset-polarity = <1>;
+                is-primary = <0>;
+	};
+        tfa98xx@34 {
+                compatible = "tfa,tfa98xx";
+                reg = <0x34>;
+                reset-gpio = <&tlmm 121 0x00>;
+                irq-gpio = <&tlmm 122 0x00>;
+                reset-polarity = <1>;
+                is-primary = <0>;
+        };
+
+};
+
+&wcd938x_codec {
+        qcom,cdc-micbias1-mv = <2500>;
+        qcom,cdc-micbias2-mv = <2700>;
+        qcom,cdc-micbias3-mv = <2500>;
+        qcom,cdc-micbias4-mv = <2500>;
+};
+
+&spf_core_platform {
+        kalama_snd: sound{
+		qcom,audio-routing =
+			"AMIC1", "Analog Mic1",
+			"AMIC1", "MIC BIAS1",
+			"AMIC2", "Analog Mic2",
+			"AMIC2", "MIC BIAS2",
+			"AMIC3", "Analog Mic3",
+			"AMIC3", "MIC BIAS3",
+			"AMIC4", "Analog Mic4",
+			"AMIC4", "MIC BIAS4",
+			"AMIC5", "Analog Mic5",
+			"AMIC5", "MIC BIAS4",
+			"VA AMIC1", "Analog Mic1",
+			"VA AMIC1", "VA MIC BIAS1",
+			"VA AMIC2", "Analog Mic2",
+			"VA AMIC2", "VA MIC BIAS2",
+			"VA AMIC3", "Analog Mic3",
+			"VA AMIC3", "VA MIC BIAS3",
+			"VA AMIC4", "Analog Mic4",
+			"VA AMIC4", "VA MIC BIAS3",
+			"VA AMIC5", "Analog Mic5",
+			"VA AMIC5", "VA MIC BIAS4",
+			"TX DMIC0", "Digital Mic0",
+			"TX DMIC0", "MIC BIAS3",
+			"TX DMIC1", "Digital Mic1",
+			"TX DMIC1", "MIC BIAS3",
+			"TX DMIC2", "Digital Mic2",
+			"TX DMIC2", "MIC BIAS1",
+			"TX DMIC3", "Digital Mic3",
+			"TX DMIC3", "MIC BIAS1",
+			"IN1_HPHL", "HPHL_OUT",
+			"IN2_HPHR", "HPHR_OUT",
+			"IN3_AUX", "AUX_OUT",
+			"RX_TX DEC0_INP", "TX DEC0 MUX",
+			"RX_TX DEC1_INP", "TX DEC1 MUX",
+			"RX_TX DEC2_INP", "TX DEC2 MUX",
+			"RX_TX DEC3_INP", "TX DEC3 MUX",
+			"TX SWR_INPUT", "WCD_TX_OUTPUT",
+			"VA SWR_INPUT", "VA_SWR_CLK",
+			"VA SWR_INPUT", "WCD_TX_OUTPUT",
+			"VA_AIF1 CAP", "VA_SWR_CLK",
+			"VA_AIF2 CAP", "VA_SWR_CLK",
+			"VA_AIF3 CAP", "VA_SWR_CLK",
+			"VA DMIC0", "Digital Mic0",
+			"VA DMIC1", "Digital Mic1",
+			"VA DMIC2", "Digital Mic2",
+			"VA DMIC3", "Digital Mic3",
+			"VA DMIC0", "VA MIC BIAS3",
+			"VA DMIC1", "VA MIC BIAS3",
+			"VA DMIC2", "VA MIC BIAS1",
+			"VA DMIC3", "VA MIC BIAS1";
+                qcom,msm-mbhc-usbc-audio-supported = <0>;
+                qcom,msm-mbhc-hphl-swh = <1>;
+                qcom,msm-mbhc-gnd-swh = <0>;
+        };
+};
+
+&kalama_snd {
+	/delete-property/ fsa4480-i2c-handle;
+};
+
+&qupv3_hub_i2c3 {
+	    status = "ok";
+		aw9620x_sar@13 {
+			compatible = "awinic,aw9620x_sar_0";
+			vcc0-supply = <&L9B>;
+			reg = <0x13>;
+			sar-num = < 0 >;
+			interrupt-parent = < &tlmm >;
+			interrupts = <63 0>;
+			irq-gpio = <&tlmm 63 0>;
+			pinctrl-names = "aw_int_default_sar0", "aw_int_active_sar0", "aw_int_suspend_sar0";
+			pinctrl-0 = <&aw_int_default_sar0>;
+			pinctrl-1 = <&aw_int_active_sar0>;
+			pinctrl-2 = <&aw_int_suspend_sar0>;
+			channel_use_flag = <0x01>;
+			status = "okay";
+		};
+};
+
+&qupv3_se8_i2c {
+		status = "ok";
+		aw9620x_sar@12 {
+			compatible = "awinic,aw9620x_sar_1";
+			reg = < 0x12 >;
+			sar-num = < 1 >;
+			interrupt-parent = < &tlmm >;
+			interrupts = <62 0>;
+			irq-gpio = <&tlmm 62 0>;
+			pinctrl-names = "aw_int_default_sar1", "aw_int_active_sar1", "aw_int_suspend_sar1";
+			pinctrl-0 = <&aw_int_default_sar1>;
+			pinctrl-1 = <&aw_int_active_sar1>;
+			pinctrl-2 = <&aw_int_suspend_sar1>;
+			vcc1-supply = <&L9B>;
+			channel_use_flag = <0x01>;
+			status = "okay";
+		};
+};
+
+&qupv3_se0_i2c {
+  #address-cells = <1>;
+  #size-cells = <0>;
+  status = "ok";
+  qcom,clk-freq-out = <400000>;
+
+  sec-nfc@27 {
+    compatible = "sec-nfc";
+    reg = <0x27>;
+
+    sec-nfc,ven-gpio = <&tlmm 30 0>;
+    sec-nfc,firm-gpio = <&tlmm 12 0>;
+    sec-nfc,irq-gpio = <&tlmm 55 0xf>;
+    //sec-nfc,pmic-ldo = "vdd_ldo20";
+    //clkctrl-reg = <0x10e60a0c>;
+    qcom,clk-src = "BBCLK2";
+    clock-names = "OSC_NFC";
+    clocks = <&rpmhcc RPMH_LN_BB_CLK2>;
+    sec-nfc,clk_req-gpio = <&tlmm 31 0>;
+    pinctrl-names = "sec_nfc_active", "sec_nfc_suspend";
+    pinctrl-0 = <&nfc_int_active_ctr &nfc_clk_req_active_ctr>;
+    pinctrl-1 = <&nfc_int_suspend_ctr &nfc_clk_req_suspend_ctr>;
+  };
+};
+
+&tlmm {
+     nfc_pin_ctr{
+         nfc_int_active_ctr: nfc_int_active_ctr {
+                mux {
+                        pins = "gpio55";
+                        function = "gpio";
+                };
+
+                config {
+                        pins = "gpio55";
+                        drive-strength = <16>;
+                        bias-pull-down;
+                        input-enable;
+                };
+
+        };
+        nfc_int_suspend_ctr: nfc_int_suspend_ctr {
+                mux {
+                        pins = "gpio55";
+                        function = "gpio";
+                };
+
+                config {
+                        pins = "gpio55";
+                        drive-strength = <16>;
+                        bias-pull-down;
+                        input-enable;
+                };
+
+        };
+        nfc_clk_req_active_ctr: nfc_clk_req_active_ctr {
+                mux {
+                        pins = "gpio31";
+                        function = "gpio";
+                };
+
+                config {
+                        pins = "gpio31";
+                        drive-strength = <2>;
+                        bias-pull-down;
+                        input-enable;
+                };
+
+        };
+        nfc_clk_req_suspend_ctr: nfc_clk_req_suspend_ctr {
+                mux {
+                        pins = "gpio31";
+                        function = "gpio";
+                };
+
+                config {
+                        pins = "gpio31";
+                        drive-strength = <2>;
+                        bias-pull-down;
+                        input-enable;
+                };
+        };
+    };
+};

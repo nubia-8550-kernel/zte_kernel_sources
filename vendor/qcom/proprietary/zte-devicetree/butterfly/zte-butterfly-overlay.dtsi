@@ -1,0 +1,318 @@
+/* dtsi for freyr board (PQ82A21)*/
+#include <dt-bindings/clock/qcom,rpmh.h>
+#include "../zte-fingerprint-axon-goodix.dtsi"
+#include "../zte-fingerprint-silead.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/clock/qcom,gcc-kalama.h>
+
+&reserved_memory {
+};
+
+&qupv3_se0_i2c {
+	 status = "ok";
+	 /delete-node/ nq@28;
+	 st21nfc: st21nfc@08 {
+			 compatible = "st,st21nfc";
+			 reg = <0x08>;
+			 interrupt-parent = <&tlmm>;
+			 interrupts = <55  0>;
+			 reset-gpios = <&tlmm 30 0x00>;
+			 irq-gpios = <&tlmm 55 0x00>;
+			 // pidle-gpios = <&tlmm 48 0x00>;
+			 clkreq-gpios = <&tlmm 31 0x00>;
+			 clocks = <&rpmhcc RPMH_LN_BB_CLK2>;
+			 clock-names = "nfc_ref_clk";
+			 st,clk_pinctrl;
+			 status = "ok";
+	 };
+};
+
+&qupv3_se1_spi {
+	 status = "ok";
+	 st54spi: st54spi@0 {
+			 compatible = "st,st54spi";
+			 reg = <0>;
+			 spi-max-frequency = <1000000>;
+			 /* gpio used as SE_PWR_REQ or SE_nRESET */
+			 gpio-power_nreset-std = <&tlmm 7 0x00>;
+
+			 /* Power management mode: none, ST54H (default), ST54J */
+			 power_mode = "ST54J";
+
+			 //pinctrl-names = "qupv3_se1_spi_sleep", "qupv3_se1_spi_active";
+			 //pinctrl-0 = <&qupv3_se1_spi_sleep>;
+			 //pinctrl-1 = <&qupv3_se1_spi_active>;
+			 status = "ok";
+	 };
+};
+
+&qupv3_se8_spi {
+	status = "ok";
+	irled@0 {
+		status = "ok";
+		compatible = "zte,zte_ir";
+		reg = <0x0>;
+		spi-max-frequency = <5000000>;
+	};
+};
+/* audio PA82A21 begin */
+&qupv3_se6_i2c {
+	status = "okay";
+	/* AWINIC AW882XX Smart PA */
+	aw882xx_smartpa@35 {
+		compatible = "awinic,aw882xx_smartpa";
+		reg = <0x35>;
+		irq-gpio = <&tlmm 172 0x2008>;
+		dc-flag = <0>;
+		sync-flag = <0>;
+		sound-channel = <0>;
+		aw-tx-topo-id = <0x1000ff00>;
+		aw-rx-topo-id = <0x1000ff01>;
+		aw-tx-port-id = <0x1007>;
+		aw-rx-port-id = <0x1006>;
+		aw-re-min = <4000>;
+		aw-re-max= <30000>;
+		/*aw-cali-mode = "none";*/
+	};
+	aw882xx_smartpa@34 {
+		compatible = "awinic,aw882xx_smartpa";
+		reg = <0x34>;
+		irq-gpio = <&tlmm 171 0x2008>;
+		dc-flag = <0>;
+		sync-flag = <0>;
+		sound-channel = <1>;
+		aw-tx-topo-id = <0x1000ff00>;
+		aw-rx-topo-id = <0x1000ff01>;
+		aw-tx-port-id = <0x1007>;
+		aw-rx-port-id = <0x1006>;
+		aw-re-min = <4000>;
+		aw-re-max= <30000>;
+		/*aw-cali-mode = "none";*/
+	};
+};
+	/* AWINIC AW882XX Smart PA End */
+
+
+&spf_core_platform {
+        kalama_snd: sound{
+		qcom,audio-routing =
+			"AMIC1", "Analog Mic1",
+			"AMIC1", "MIC BIAS1",
+			"AMIC2", "Analog Mic2",
+			"AMIC2", "MIC BIAS2",
+			"AMIC3", "Analog Mic3",
+			"AMIC3", "MIC BIAS3",
+			"AMIC4", "Analog Mic4",
+			"AMIC4", "MIC BIAS4",
+			"AMIC5", "Analog Mic5",
+			"AMIC5", "MIC BIAS4",
+			"VA AMIC1", "Analog Mic1",
+			"VA AMIC1", "VA MIC BIAS1",
+			"VA AMIC2", "Analog Mic2",
+			"VA AMIC2", "VA MIC BIAS2",
+			"VA AMIC3", "Analog Mic3",
+			"VA AMIC3", "VA MIC BIAS3",
+			"VA AMIC4", "Analog Mic4",
+			"VA AMIC4", "VA MIC BIAS3",
+			"VA AMIC5", "Analog Mic5",
+			"VA AMIC5", "VA MIC BIAS4",
+			"TX DMIC0", "Digital Mic0",
+			"TX DMIC0", "MIC BIAS3",
+			"TX DMIC1", "Digital Mic1",
+			"TX DMIC1", "MIC BIAS3",
+			"TX DMIC2", "Digital Mic2",
+			"TX DMIC2", "MIC BIAS1",
+			"TX DMIC3", "Digital Mic3",
+			"TX DMIC3", "MIC BIAS1",
+			"IN1_HPHL", "HPHL_OUT",
+			"IN2_HPHR", "HPHR_OUT",
+			"IN3_AUX", "AUX_OUT",
+			"RX_TX DEC0_INP", "TX DEC0 MUX",
+			"RX_TX DEC1_INP", "TX DEC1 MUX",
+			"RX_TX DEC2_INP", "TX DEC2 MUX",
+			"RX_TX DEC3_INP", "TX DEC3 MUX",
+			"TX SWR_INPUT", "WCD_TX_OUTPUT",
+			"VA SWR_INPUT", "VA_SWR_CLK",
+			"VA SWR_INPUT", "WCD_TX_OUTPUT",
+			"VA_AIF1 CAP", "VA_SWR_CLK",
+			"VA_AIF2 CAP", "VA_SWR_CLK",
+			"VA_AIF3 CAP", "VA_SWR_CLK",
+			"VA DMIC0", "Digital Mic0",
+			"VA DMIC1", "Digital Mic1",
+			"VA DMIC2", "Digital Mic2",
+			"VA DMIC3", "Digital Mic3",
+			"VA DMIC0", "VA MIC BIAS3",
+			"VA DMIC1", "VA MIC BIAS3",
+			"VA DMIC2", "VA MIC BIAS1",
+			"VA DMIC3", "VA MIC BIAS1";
+        };
+};
+/* audio PQ82A21 end */
+&qupv3_se4_i2c {
+
+	status = "ok";
+
+	goodix-berlin@5d {
+		compatible = "goodix,brl-b";
+		reg = <0x5d>;
+		goodix,avdd-gpio = <&tlmm 23 0x0>;
+		goodix,iovdd-name = "iovdd";
+		iovdd-supply = <&L12B>;
+		goodix,reset-gpio = <&tlmm 24 0x0>;
+		goodix,irq-gpio = <&tlmm 25 0x0>;
+		goodix,irq-flags = <2>; /* 1:trigger rising, 2:trigger falling;*/
+		goodix,panel-max-x = <2200>;
+		goodix,panel-max-y = <2480>;
+		goodix,panel-max-w = <255>;
+		goodix,firmware-name = "goodix_firmware_9966.bin";
+		goodix,config-name = "goodix_cfg_group_9966.bin";
+		panel = <&dsi_bf068_nt37900_fold_dev1_dsc_cmd>;
+
+		 /* optional properties */
+		goodix,panel-max-p = <4096>; /* max pressure that pen device supported */
+		goodix,pen-enable; /* support active stylus device*/
+		goodix.sleep-enable; /* enter sleep mode */
+	};
+};
+
+&qupv3_se15_4uart {
+        status = "ok";
+};
+
+&soc {
+	zte_tp:zte_tp {
+		compatible = "zte_tp";
+		zte,tp_algo;
+		zte,tp_jitter_check = <15>;
+		zte,tp_jitter_timer = <80>;
+		zte,tp_long_press;
+		zte,tp_long_press_timer = <800>;
+		zte,tp_long_press_left_v = <20>;
+		zte,tp_long_press_right_v = <20>;
+		zte,tp_long_press_left_h = <20>; /*camera */
+		zte,tp_long_press_right_h = <20>; /*charger */
+		zte,tp_edge_click_suppression_pixel = <5>;
+		zte,ufp_enable;
+		zte,ufp_circle_center_x = <4320>;
+		zte,ufp_circle_center_y = <13624>;
+		zte,ufp_circle_radius = <640>;
+	};
+
+        /* HS UART Instance 01 for rchip communication*/
+        zte_rchip {
+                compatible = "zte-rchip";
+                reset-gpio = <&tlmm 99 GPIO_ACTIVE_LOW>;
+                fw_dload = <&tlmm 124 GPIO_ACTIVE_HIGH>;
+                power_1p8_en = <&tlmm 104 GPIO_ACTIVE_HIGH>;
+                bd_gps_sw = <&tlmm 122 GPIO_ACTIVE_HIGH>;
+                bd_wifi_sw = <&tlmm 123 GPIO_ACTIVE_HIGH>;
+                bd_lna_en = <&tlmm 125 GPIO_ACTIVE_HIGH>;
+
+                status="okay";
+        };
+};
+
+/* add zte haptic start */
+&qupv3_hub_i2c4 {
+	status = "ok";
+	qcom,clk-freq-out = <1000000>;
+	haptic_hv@5A {
+		compatible = "awinic,haptic_hv";
+		reg = <0x5A>;
+		irq-gpio = <&tlmm 98 0>;
+		reset-gpio = <&tlmm 97 0>;
+		pinctrl-names = "irq_active";
+		pinctrl-0 = <&gpio98_input_pull_up>;
+		f0_pre = < 1700 >;
+		mode = /bits/ 8 < 1 >;
+		f0_cali_percent = /bits/ 8 < 7 >;
+/******************************aw8692x*******************************/
+		aw8692x_max_bst_vol = /bits/ 8 < 0x7F >;
+		aw8692x_cont_drv1_lvl = /bits/ 8 < 0x7F >;
+		aw8692x_cont_drv2_lvl = /bits/ 8 < 0x50 >;
+		aw8692x_cont_drv1_time = /bits/ 8 < 0x04 >;
+		aw8692x_cont_drv2_time = /bits/ 8 < 0x06 >;
+		aw8692x_cont_drv_width = /bits/ 8 < 0x6A >;
+		aw8692x_cont_wait_num = /bits/ 8 < 0x06 >;
+		aw8692x_cont_brk_time = /bits/ 8 < 0 >;
+		aw8692x_cont_track_margin = /bits/ 8 < 0x0C >;
+		aw8692x_brk_bst_md = /bits/ 8 < 0 >;
+		aw8692x_cont_tset = /bits/ 8 < 0x06 >;
+		aw8692x_cont_bemf_set = /bits/ 8 < 0x02 >;
+		aw8692x_cont_bst_brk_gain = /bits/ 8 < 0x05 >;
+		aw8692x_cont_brk_gain = /bits/ 8 < 0x08 >;
+		aw8692x_duration_time = /bits/ 8 < 20 30 60 >;
+		aw8692x_d2s_gain = /bits/ 8 < 0x04 >;
+		aw8692x_trig_config = /bits/ 8 < 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0
+						 0 0 0 1 0 2 0 0 >;
+		aw8692x_bst_vol_default = /bits/ 8 < 0x50 >;
+		aw8692x_bst_vol_ram = /bits/ 8 < 0x50 >;
+		aw8692x_bst_vol_rtp = /bits/ 8 < 0x50 >;
+		/* aw8692x_is_enabled_auto_bst; */
+		/* aw8692x_is_enabled_one_wire; */
+	};
+
+	ak09973@10 {
+		compatible = "akm,ak09973";
+		reg = <0x10>;
+		gpios = <&tlmm 60 0x00>;
+		vdd-supply = <&L15B>;
+		ak09973,mode = <1>;
+		ak09973,DRDY_event = <0>;
+		ak09973,SW_event = <0 0 0 1>;
+		ak09973,ERR_event = <0>;
+		ak09973,POL_setting = <0 0 0 0 >;
+		ak09973,SDR_setting = <0>;
+		ak09973,SMR_setting = <1>;
+		ak09973,threshold_X = < 0xFDA8 0xF95C >; // -600 -1700
+		ak09973,threshold_Y = < 0x0BB8 0x00 >; // 3000 0
+		ak09973,threshold_Z = < 0x00C8 0xFFBA>; // 200 -70
+		ak09973,threshold_V = < 0x1178 0x0C5A>; // 20.000000 10.000000
+		ak09973,threshold_V2 = < 0x28F9 0x250E>; // 110.000000 90.000000
+	};
+};
+
+&tlmm {
+	gpio98_input_pull_up: gpio98_input_pull_up {
+		mux {
+			 pins = "gpio98";
+			 function = "gpio";
+		};
+
+		config {
+			pins = "gpio98";
+			drive-strength = <2>;
+			bias-pull-up;
+			input-enable;
+		};
+	};
+};
+
+/* add zte safechip begin */
+&qupv3_se10_spi {
+	status = "ok";
+
+	spi_ssx1207@0 {
+	compatible = "veb,veba5-spi";
+	reg = <0>;
+	voltage-ranges = <2950 2950>;
+	spi-max-frequency = <50000000>;
+	veb_spi_vebv3,reset-gpio = <&tlmm 69 0x0>;
+	veb_spi_vebv3,status-gpio = <&tlmm 8 0x0>;
+	veb_spi_vebv3,wake-gpio = <&tlmm 68 0x0>;
+	veb_spi_vebv3,power-en-gpio = <&tlmm 70 0>; //3p3
+	spi-cpol = <1>;
+	spi-cpha = <1>;
+
+	pinctrl-names = "wake_rst_sts_poll_up", "wake_poll_down";
+
+	/*pinctrl-0 = <&gpios0_poll_up>;*/
+	/*pinctrl-1 = <&wake0_poll_down>;*/
+
+	qcom,use-pinctrl;
+	};
+};
+/* add zte safechip end */

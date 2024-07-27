@@ -1,0 +1,2 @@
+/* dtsi for aurora board (PQ82A01_FOLD)*/
+#include "../zte-fingerprint-axon-goodix.dtsi"

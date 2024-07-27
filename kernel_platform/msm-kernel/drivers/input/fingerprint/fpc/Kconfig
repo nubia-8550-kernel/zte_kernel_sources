@@ -1,0 +1,6 @@
+config FPC_FINGERPRINT
+        tristate "FPC Finger Print Driver"
+        help
+          PFC Finger Print Supported
+
+

@@ -1,0 +1,61 @@
+#include "kalama-sde-display.dtsi"
+#include "dsi-panel-zte-bf068-nt37900-fold-dev1-dsc-cmd.dtsi"
+#include "dsi-panel-zte-bf068-nt37900-fold-dev2-dsc-cmd.dtsi"
+
+&soc {
+	/* add by zte for lcd new panel begin*/
+	display_panel_a50u_vio: display_panel_a50u_vio {
+		compatible = "qti-regulator-fixed";
+		regulator-name = "display_panel_a50u_vio";
+		gpio = <&tlmm 89 0>;
+		enable-active-high;
+		regulator-boot-on;
+	};
+	display_panel_a50u_dvdd: display_panel_a50u_dvdd {
+		compatible = "qti-regulator-fixed";
+		regulator-name = "display_panel_a50u_dvdd";
+		gpio = <&tlmm 12 0>;
+		enable-active-high;
+		regulator-boot-on;
+	};
+	dsi_panel_pwr_supply_a50u: dsi_panel_pwr_supply_a50u {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		qcom,panel-supply-entry@0 {
+			reg = <0>;
+			qcom,supply-name = "a50u_vio";
+			qcom,supply-min-voltage = <1800000>;
+			qcom,supply-max-voltage = <1800000>;
+			qcom,supply-enable-load = <200000>;
+			qcom,supply-disable-load = <80>;
+			qcom,supply-post-on-sleep = <1>;
+		};
+
+		qcom,panel-supply-entry@1 {
+			reg = <1>;
+			qcom,supply-name = "a50u_dvdd";
+			qcom,supply-min-voltage = <1200000>;
+			qcom,supply-max-voltage = <1200000>;
+			qcom,supply-enable-load = <299000>;
+			qcom,supply-disable-load = <0>;
+			qcom,supply-post-on-sleep = <1>;
+		};
+
+		qcom,panel-supply-entry@2 {
+			reg = <2>;
+			qcom,supply-name = "vci";
+			qcom,supply-min-voltage = <3000000>;
+			qcom,supply-max-voltage = <3000000>;
+			qcom,supply-enable-load = <20000>;
+			qcom,supply-disable-load = <0>;
+			qcom,supply-post-on-sleep = <10>;
+			qcom,supply-pre-off-sleep = <5>;
+			qcom,supply-post-off-sleep = <5>;
+		};
+	};
+};
+&sde_dsi {
+	a50u_vio-supply = <&display_panel_a50u_vio>;
+	a50u_dvdd-supply = <&display_panel_a50u_dvdd>;
+};

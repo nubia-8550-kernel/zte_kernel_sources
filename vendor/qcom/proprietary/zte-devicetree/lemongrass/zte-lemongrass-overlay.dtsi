@@ -1,0 +1,106 @@
+/* dtsi for lemongrass board (PQ82A25_TT)*/
+#include <dt-bindings/clock/qcom,rpmh.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/interrupt-controller/irq.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/clock/qcom,gcc-waipio.h>
+
+&qupv3_se15_4uart {
+        status = "ok";
+};
+
+&soc {
+        /*tiantong config*/
+        zte_tiantong {
+                compatible = "zte-tiantong";
+                tt_rst_n = <&tlmm 99 GPIO_ACTIVE_LOW>;
+                tt2ap_wakeup = <&tlmm 62 GPIO_ACTIVE_HIGH>;
+                ap2tt_wakeup = <&tlmm 63 GPIO_ACTIVE_HIGH>;
+                tt_rfvcc_en = <&tlmm 124 GPIO_ACTIVE_HIGH>;
+                tt_1p8_en = <&tlmm 104 GPIO_ACTIVE_HIGH>;
+                tt_1p1_en = <&tlmm 123 GPIO_ACTIVE_HIGH>;
+                tt_boost_en = <&tlmm 125 GPIO_ACTIVE_HIGH>;
+
+                status="okay";
+        };
+};
+
+&qupv3_se4_spi {
+	status = "ok";
+
+	focaltech@0 {
+		compatible = "focaltech,fts";
+		reg = <0x00>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <25 0x02>;
+		focaltech,reset-gpio = <&tlmm 24 0x01>;
+		focaltech,irq-gpio = <&tlmm 25 0x02>;
+		focaltech,max-touch-number = <10>;
+		focaltech,display-coords =  <0 0 8640 19200>;
+		focal,iovdd-name = "avdd";
+		vdd-supply = <&L12B>;
+		avdd-enable-gpio = <&tlmm 23 0x0>;
+
+		pinctrl-names = "pmx_ts_active","pmx_ts_suspend","pmx_ts_release";
+		pinctrl-0 = <&ts_active>;
+		pinctrl-1 = <&ts_int_suspend &ts_reset_suspend>;
+		pinctrl-2 = <&ts_release>;
+	};
+};
+
+&soc {
+	zte_tp:zte_tp {
+		compatible = "zte_tp";
+		zte,tp_algo;
+		zte,tp_jitter_check = <15>;
+		zte,tp_jitter_timer = <80>;
+		zte,tp_long_press;
+		zte,tp_long_press_timer = <800>;
+		zte,tp_long_press_left_v = <20>;
+		zte,tp_long_press_right_v = <20>;
+		zte,tp_long_press_left_h = <30>; /*camera */
+		zte,tp_long_press_right_h = <20>; /*charger */
+		zte,tp_edge_click_suppression_pixel = <5>;
+		zte,ufp_enable;
+		zte,ufp_circle_center_x = <4320>;
+		zte,ufp_circle_center_y = <17456>;
+		zte,ufp_circle_radius = <640>;
+	};
+
+};
+
+&qupv3_se6_i2c {
+	status = "okay";
+	/* AWINIC AW882XX Smart PA */
+	aw882xx_smartpa@35 {
+		compatible = "awinic,aw882xx_smartpa";
+		reg = <0x35>;
+		irq-gpio = <&tlmm 172 0x2008>;
+		dc-flag = <0>;
+		sync-flag = <0>;
+		sound-channel = <0>;
+		aw-tx-topo-id = <0x1000ff00>;
+		aw-rx-topo-id = <0x1000ff01>;
+		aw-tx-port-id = <0x1007>;
+		aw-rx-port-id = <0x1006>;
+		aw-re-min = <4000>;
+		aw-re-max= <30000>;
+		/*aw-cali-mode = "none";*/
+	};
+	aw882xx_smartpa@34 {
+		compatible = "awinic,aw882xx_smartpa";
+		reg = <0x34>;
+		irq-gpio = <&tlmm 171 0x2008>;
+		dc-flag = <0>;
+		sync-flag = <0>;
+		sound-channel = <1>;
+		aw-tx-topo-id = <0x1000ff00>;
+		aw-rx-topo-id = <0x1000ff01>;
+		aw-tx-port-id = <0x1007>;
+		aw-rx-port-id = <0x1006>;
+		aw-re-min = <4000>;
+		aw-re-max= <30000>;
+		/*aw-cali-mode = "none";*/
+	};
+};
+	/* AWINIC AW882XX Smart PA End */

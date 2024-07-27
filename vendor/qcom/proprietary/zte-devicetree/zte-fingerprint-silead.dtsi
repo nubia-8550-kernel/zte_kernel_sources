@@ -1,0 +1,11 @@
+&soc {
+	silead_fp {
+		status = "ok";
+		compatible = "sil,silead_fp";
+		qcom,qup-id = <10>;
+		reg = <0>;
+		avdd-gpios = <&tlmm 22 0x1>;
+		irq-gpios = <&tlmm 40 0x2008>;
+		rst-gpios = <&tlmm 42 0x1>;
+	};
+};

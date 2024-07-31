@@ -1,0 +1,48 @@
+##config for sm8550 platform
+#ADD:CONFIG_*
+CONFIG_ZTE_BOOT_CODE=y
+#--------------------------
+# vendor soc driver
+#--------------------------
+CONFIG_VENDOR_SOC_QCOM_SRC=y
+CONFIG_VENDOR_IMEM_INFO=m
+CONFIG_VENDOR_KERNEL_MODULE_PARAM=m
+
+#--------------------------
+# vendor common driver
+#--------------------------
+CONFIG_VENDOR_COMMON_COMPILE=y
+
+# zcard detect
+CONFIG_ZCARD_HOLDER=m
+
+#charger
+CONFIG_POWER_VENDOR_COMMON=y
+CONFIG_VENDOR_ZTE_MISC=m
+CONFIG_VENDOR_CHARGER_POLICY_SERVICE=m
+CONFIG_ZTE_POWER_SUPPLY=m
+
+#---------------------------
+# Pmic
+#---------------------------
+CONFIG_VENDOR_PMLOG=m
+CONFIG_VENDOR_PMLOG_PLATFORM=8550
+
+#zramwriteback
+CONFIG_ZRAM_WRITEBACK=y
+
+#zlog
+CONFIG_VENDOR_ZTE_DEV_MONITOR_SYSTEM=y
+CONFIG_VENDOR_ZTE_LOG_EXCEPTION=m
+CONFIG_VENDOR_ZTE_LOG_COMMON=m
+CONFIG_VENDOR_ZTE_LOG_E_TEST=m
+
+#stability debug
+CONFIG_QCOM_RTB=m
+CONFIG_QCOM_RTB_SEPARATE_CPUS=y
+
+#LCD
+CONFIG_ZTE_LCD_COMMON_FUNCTION=y
+
+#stats info for iotop
+CONFIG_VENDOR_STATS_INFO=m
